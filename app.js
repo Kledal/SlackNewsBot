@@ -78,8 +78,10 @@ function seed(db) {
   feeds.push({url: "http://rss.nytimes.com/services/xml/rss/nyt/Technology.xml"});
   feeds.push({url: "http://www.cnet.com/rss/news/"});
   feeds.push({url: "http://www.cnet.com/rss/iphone-update/"});
+  feeds.push({url: "https://www.engadget.com/rss.xml"});
 
   var collection = db.collection('feed_urls');
+  collection.remove();
   collection.insertMany(feeds, (err, result) => {
     if (err) console.log(err);
   });
@@ -87,12 +89,7 @@ function seed(db) {
 }
 
 connectdb(function (db) {
-  var collection = db.collection('feed_urls');
-  collection.find().toArray((err, result) => {
-    if (result.length == 0) {
-      feeds = seed(db);
-    }
-  });
+  seed(db);
 });
 
 function postArticle(channel, article) {
