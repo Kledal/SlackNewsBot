@@ -1,6 +1,4 @@
-if (process.env.DEVELOPMENT) {
-  require('dotenv').config();
-}
+require('dotenv').config();
 
 var _ = require('lodash');
 var q = require('q');
@@ -10,8 +8,6 @@ var MongoClient = require('mongodb').MongoClient;
 var getRSS = require('./read_rss');
 
 var feeds = [];
-
-console.log(process.env.MONGO_URL);
 
 function connectdb(callback) {
   MongoClient.connect(process.env.MONGO_URL, function (err, db) {
@@ -137,4 +133,4 @@ function parseRSS(feeds) {
   );
 }
 
-setInterval(fetchRSS, 5000);
+setInterval(fetchRSS, 60000);
