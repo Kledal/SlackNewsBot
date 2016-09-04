@@ -1,0 +1,27 @@
+{
+  "name": "slack_news",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Kledal/SlackNewsBot.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Kledal/SlackNewsBot/issues"
+  },
+  "homepage": "https://github.com/Kledal/SlackNewsBot#readme",
+  "dependencies": {
+    "dotenv": "^2.0.0",
+    "feedparser": "^1.1.4",
+    "lodash": "^4.15.0",
+    "node-fetch": "^1.6.0",
+    "request": "^2.74.0",
+    "slackbots": "^0.5.2"
+  }
+}
