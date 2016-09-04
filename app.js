@@ -11,6 +11,7 @@ var feeds = [];
 
 function connectdb(callback) {
   MongoClient.connect(process.env.MONGO_URL, function (err, db) {
+    if (err) console.log(err);
     if (!err) callback(db);
   });
 }
