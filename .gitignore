@@ -16,6 +16,7 @@
 # .env
 
 ## Specific to RubyMotion:
+.env
 .dat*
 .repl_history
 build/
