@@ -79,6 +79,7 @@ function seed(db) {
   feeds.push({url: "http://www.cnet.com/rss/news/"});
   feeds.push({url: "http://www.cnet.com/rss/iphone-update/"});
   feeds.push({url: "https://www.engadget.com/rss.xml"});
+  feeds.push({url: "http://borsen.dk/rss/"});
 
   var collection = db.collection('feed_urls');
   collection.remove();
