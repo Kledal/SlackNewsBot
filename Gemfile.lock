@@ -1,11 +1,13 @@
 GEM
   remote: http://rubygems.org/
   specs:
+    dotenv (2.1.1)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
+  dotenv
 
 RUBY VERSION
    ruby 2.3.1p112
