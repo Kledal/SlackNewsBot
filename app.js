@@ -1,6 +1,7 @@
 require('dotenv').config();
 
 var _ = require('lodash');
+var q = require('q');
 var SlackBot = require('slackbots');
 var fetch = require('node-fetch');
 var MongoClient = require('mongodb').MongoClient;
@@ -23,29 +24,45 @@ var bot = new SlackBot({
 bot.on('start', function () {
 });
 
+function getResponse(data) {
+  var deferred = q.defer();
+  connectdb((db) => {
+    var collection = db.collection('feed_urls').find({}).toArray()
+      .then((result) => {
+        var response = "";
+        response = JSON.stringify(_.map(result, function (feed) {
+          return feed.url;
+        }));
+
+        deferred.resolve(response);
+      });
+  });
+
+  return deferred.promise;
+}
+
 function handleMessage(data) {
   if (data.subtype === 'bot_message') return;
   var isPrivateChat = data.channel[0] === 'D';
   var msg = data.text;
-  var response = "";
 
-  response = "Hi";
-
-  if (isPrivateChat) {
-    bot.getUserById(data.user).then((user) => {
-      console.log("Post to user: " + user);
-      bot.postMessageToUser(user.name, response, {});
-    });
-  } else {
-    bot.getChannelById(data.channel).then((channel) => {
-      console.log("Post to channel: " + channel);
-      bot.postMessageToChannel(channel.name, response, {})
-    });
-  }
+  getResponse(data).then((response) => {
+    if (isPrivateChat) {
+      bot.getUserById(data.user).then((user) => {
+        console.log("Post to user: " + user);
+        bot.postMessageToUser(user.name, response, {});
+      });
+    } else {
+      bot.getChannelById(data.channel).then((channel) => {
+        console.log("Post to channel: " + channel);
+        bot.postMessageToChannel(channel.name, response, {})
+      });
+    }
+  });
 }
 
-bot.on('message', function(data) {
-  switch(data.type) {
+bot.on('message', function (data) {
+  switch (data.type) {
     case 'message':
       handleMessage(data);
       break;
