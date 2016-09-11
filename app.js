@@ -37,17 +37,24 @@ function getResponse(data) {
 
   var text = messageInfo.slice(1).join(' ');
 
+  let responseText = "";
+
   console.log("[getResponse] Handle command: " + command);
 
   switch(command) {
     case 'like':
       trainClassifier(text, 'like');
+      responseText = classifier.classify(text);
       break;
     case 'dislike':
       trainClassifier(text, 'dislike');
+      responseText = classifier.classify(text);
+      break;
+    default:
+      responseText = "I don't understand that command, sorry.";
       break;
   }
-  deferred.resolve(classifier.classify(text));
+  deferred.resolve(responseText);
   return deferred.promise;
 }
 
