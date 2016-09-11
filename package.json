@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "main": "app.js",
+  "engines": {
+    "node": "6.2.0"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -18,6 +21,7 @@
   "homepage": "https://github.com/Kledal/SlackNewsBot#readme",
   "dependencies": {
     "dotenv": "^2.0.0",
+    "events": "^1.1.1",
     "feedparser": "^1.1.4",
     "lodash": "^4.15.0",
     "mongodb": "^2.2.9",
@@ -25,6 +29,7 @@
     "node-fetch": "^1.6.0",
     "q": "^1.4.1",
     "request": "^2.74.0",
-    "slackbots": "^0.5.2"
+    "slackbots": "^0.5.2",
+    "util": "^0.10.3"
   }
 }
