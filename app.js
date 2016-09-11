@@ -7,6 +7,9 @@ var fetch = require('node-fetch');
 var MongoClient = require('mongodb').MongoClient;
 var getRSS = require('./read_rss');
 
+var natural = require('natural'),
+  classifier = new natural.BayesClassifier();
+
 var feeds = [];
 
 function connectdb(callback) {
@@ -27,17 +30,19 @@ bot.on('start', function () {
 
 function getResponse(data) {
   var deferred = q.defer();
-  connectdb((db) => {
-    var collection = db.collection('feed_urls').find({}).toArray()
-      .then((result) => {
-        var response = "";
-        response = JSON.stringify(_.map(result, function (feed) {
-          return feed.url;
-        }));
+  // connectdb((db) => {
+  //   var collection = db.collection('feed_urls').find({}).toArray()
+  //     .then((result) => {
+  //       var response = "";
+  //       response = JSON.stringify(_.map(result, function (feed) {
+  //         return feed.url;
+  //       }));
 
-        deferred.resolve(response);
-      });
-  });
+  //       deferred.resolve(response);
+  //     });
+  // });
+
+  deferred.resolve( classifier.classify(data.text) );
 
   return deferred.promise;
 }
@@ -62,8 +67,39 @@ function handleMessage(data) {
   });
 }
 
+function handleReaction(data) {
+  var itemChannel = data.item.channel;
+  var reaction = data.reaction;
+
+  var reactionMode = reaction === '+1' ? 'like' : 'dislike';
+
+  console.log("Reaction in channel: " + itemChannel);
+  var params = {
+    channel: itemChannel,
+    oldest: data.item.ts,
+    inclusive: 1
+  };
+
+  bot._api('channels.history', params).then((response) => {
+    var messages = response.messages;
+    if (messages.length === 0) return;
+    var fullMessage = messages.reverse()[0].text;
+
+    var messageText = fullMessage.split(' -')[0];
+
+    classifier.addDocument(messageText, reactionMode);
+    classifier.train();
+
+    var text = "I just classified <" + messageText + "> as " + reaction;
+    bot.postMessage(data.user, text, { as_user: true });
+  });
+}
+
 bot.on('message', function (data) {
+  console.log(data);
   switch (data.type) {
+    case 'reaction_added':
+      handleReaction(data);
     case 'message':
       handleMessage(data);
       break;
@@ -94,7 +130,12 @@ connectdb(function (db) {
 });
 
 function postArticle(channel, article) {
-  bot.postMessageToChannel(channel, `${article.title} - ${article.link}`)
+  var mentions = "";
+  if (classifier.classify(article.title) === 'like') {
+    mentions = "@kledal ";
+  }
+  
+  bot.postMessageToChannel(channel, `${mentions}${article.title} - ${article.link}`)
 }
 
 function fetchRSS() {
