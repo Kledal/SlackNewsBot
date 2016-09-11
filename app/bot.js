@@ -45,7 +45,7 @@ Bot.prototype.postArticle = function (channel, article) {
     mentions = "<@kledal> ";
   }
 
-  this.slackBot.postMessageToChannel(channel, `${article.title} - ${mentions}${article.link}`)
+  //this.slackBot.postMessageToChannel(channel, `${article.title} - ${mentions}${article.link}`)
 };
 
 
@@ -90,7 +90,7 @@ Bot.prototype._handleReaction = function (data) {
 
     var messageText = fullMessage.split(' -')[0];
 
-    this.trainClassifier(messageText, reactionMode);
+    this._trainClassifier(messageText, reactionMode);
 
     var text = "I just classified <" + messageText + "> as " + reaction;
     this.slackBot.postMessage(data.user, text, {as_user: true});
