@@ -45,7 +45,7 @@ Bot.prototype.postArticle = function (channel, article) {
     mentions = "<@kledal> ";
   }
 
-  //this.slackBot.postMessageToChannel(channel, `${article.title} - ${mentions}${article.link}`)
+  this.slackBot.postMessageToChannel(channel, `${article.title} - ${mentions}${article.link}`)
 };
 
 
