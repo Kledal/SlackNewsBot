@@ -164,7 +164,7 @@ connectdb(function (db) {
 function postArticle(channel, article) {
   var mentions = "";
   if (classifier.classify(article.title) === 'like') {
-    mentions = "@kledal ";
+    mentions = "<@kledal> ";
   }
 
   bot.postMessageToChannel(channel, `${article.title} - ${mentions}${article.link}`)
