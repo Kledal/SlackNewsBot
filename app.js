@@ -37,7 +37,7 @@ function getResponse(data) {
 
   var text = messageInfo.slice(1).join(' ');
 
-  let responseText = "";
+  var responseText = "";
 
   console.log("[getResponse] Handle command: " + command);
 
