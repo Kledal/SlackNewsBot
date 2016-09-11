@@ -5,7 +5,7 @@ var q = require('q');
 var fetch = require('node-fetch');
 var MongoClient = require('mongodb').MongoClient;
 var getRSS = require('./read_rss');
-var Bot = require('./app/Bot');
+var Bot = require('./app/bot');
 
 var natural = require('natural');
 
