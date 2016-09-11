@@ -21,6 +21,7 @@
     "feedparser": "^1.1.4",
     "lodash": "^4.15.0",
     "mongodb": "^2.2.9",
+    "natural": "^0.4.0",
     "node-fetch": "^1.6.0",
     "q": "^1.4.1",
     "request": "^2.74.0",
