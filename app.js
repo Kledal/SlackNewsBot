@@ -30,28 +30,38 @@ bot.on('start', function () {
 
 function getResponse(data) {
   var deferred = q.defer();
-  // connectdb((db) => {
-  //   var collection = db.collection('feed_urls').find({}).toArray()
-  //     .then((result) => {
-  //       var response = "";
-  //       response = JSON.stringify(_.map(result, function (feed) {
-  //         return feed.url;
-  //       }));
+  var msg = data.text;
 
-  //       deferred.resolve(response);
-  //     });
-  // });
+  var messageInfo = msg.split(' ');
+  var command = messageInfo[0];
 
-  deferred.resolve( classifier.classify(data.text) );
+  var text = messageInfo.slice(1).join(' ');
 
+  console.log("[getResponse] Handle command: " + command);
+
+  switch(command) {
+    case 'like':
+      trainClassifier(text, 'like');
+      break;
+    case 'dislike':
+      trainClassifier(text, 'dislike');
+      break;
+  }
+  deferred.resolve(classifier.classify(text));
   return deferred.promise;
 }
 
 function handleMessage(data) {
-  if (data.subtype === 'bot_message') return;
+  const ignoredTypes = ['bot_message', 'message_deleted'];
+  if (_.includes(ignoredTypes, data.subtype)) return;
+  if (data.bot_id) return;
+
   var isPrivateChat = data.channel[0] === 'D';
+  if (!isPrivateChat) return;
+
   var msg = data.text;
 
+  console.log("[HandleMessage] " + data.text)
   getResponse(data).then((response) => {
     if (isPrivateChat) {
       bot.getUserById(data.user).then((user) => {
@@ -64,6 +74,15 @@ function handleMessage(data) {
         bot.postMessageToChannel(channel.name, response, {})
       });
     }
+  });
+}
+
+function trainClassifier(text, reaction) {
+  classifier.addDocument(text, reaction);
+  classifier.train();
+
+  connectdb((db) => {
+    db.collection('classifier').update({kledal: true}, {raw: JSON.stringify(classifier), kledal: true}, { upsert: true });
   });
 }
 
@@ -87,11 +106,10 @@ function handleReaction(data) {
 
     var messageText = fullMessage.split(' -')[0];
 
-    classifier.addDocument(messageText, reactionMode);
-    classifier.train();
+    trainClassifier(messageText, reactionMode);
 
     var text = "I just classified <" + messageText + "> as " + reaction;
-    bot.postMessage(data.user, text, { as_user: true });
+    bot.postMessage(data.user, text, {as_user: true});
   });
 }
 
@@ -125,8 +143,22 @@ function seed(db) {
   return feeds;
 }
 
+function preloadClassifier(db) {
+  var collection = db.collection('classifier');
+  collection.find({kledal: true}).toArray((err, docs) => {
+
+    if (docs.length == 1) {
+      var data = docs[0];
+      var raw = data.raw;
+      classifier = natural.BayesClassifier.restore(JSON.parse(raw));
+    }
+  });
+}
+
 connectdb(function (db) {
   seed(db);
+
+  preloadClassifier(db);
 });
 
 function postArticle(channel, article) {
@@ -134,8 +166,8 @@ function postArticle(channel, article) {
   if (classifier.classify(article.title) === 'like') {
     mentions = "@kledal ";
   }
-  
-  bot.postMessageToChannel(channel, `${mentions}${article.title} - ${article.link}`)
+
+  bot.postMessageToChannel(channel, `${article.title} - ${mentions}${article.link}`)
 }
 
 function fetchRSS() {
