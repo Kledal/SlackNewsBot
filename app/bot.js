@@ -12,12 +12,24 @@ var FeedCommands = require('./handlers/FeedCommands');
 
 const ignoredTypes = ['bot_message', 'message_deleted'];
 
+var DoILike = {
+  command: 'test-like',
+  process: function (bot, command, data) {
+    if (command !== 'like') return;
+
+    var status = bot.classifier.classify(text);
+
+    bot.slackBot.postMessage(data.user, `Response: ${status}`, {as_user: true})
+  }
+};
+
 function Bot() {
   this.commandHandlers = [
     DislikeHandler,
     LikeHandler,
     HelpHandler,
-    FeedCommands.ListFeeds];
+    FeedCommands.ListFeeds,
+    DoILike];
 
 
   this.db = null;
