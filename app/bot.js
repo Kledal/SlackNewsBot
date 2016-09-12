@@ -16,7 +16,7 @@ var DoILike = {
   command: 'test-like',
   process: function (bot, command, data) {
     if (command !== 'test-like') return;
-
+    var text = data.text.split(' ').slice(1).join(' ');
     var status = bot.classifier.classify(text);
 
     bot.slackBot.postMessage(data.user, `Response: ${status}`, {as_user: true})
