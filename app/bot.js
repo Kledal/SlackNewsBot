@@ -15,7 +15,7 @@ const ignoredTypes = ['bot_message', 'message_deleted'];
 var DoILike = {
   command: 'test-like',
   process: function (bot, command, data) {
-    if (command !== 'like') return;
+    if (command !== 'test-like') return;
 
     var status = bot.classifier.classify(text);
 
